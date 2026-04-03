@@ -48,7 +48,9 @@ export async function POST(request: NextRequest) {
       ],
     });
 
-    return NextResponse.json({ markdown });
+    // Strip <think>...</think> blocks (MiniMax M2.7 may include them)
+    const cleaned = markdown.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+    return NextResponse.json({ markdown: cleaned });
   } catch (error) {
     console.error('Analysis error:', error);
     const message = error instanceof Error ? error.message : '分析失敗';

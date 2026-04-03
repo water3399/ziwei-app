@@ -7,6 +7,40 @@ interface ChatRequestBody {
   reportContext: string;
 }
 
+/** Strip <think>...</think> blocks from streaming response */
+function createThinkStripper(): TransformStream<string, string> {
+  let insideThink = false;
+  let buffer = '';
+  return new TransformStream<string, string>({
+    transform(chunk, controller) {
+      buffer += chunk;
+      while (buffer.length > 0) {
+        if (insideThink) {
+          const closeIdx = buffer.indexOf('</think>');
+          if (closeIdx === -1) { buffer = ''; return; }
+          buffer = buffer.slice(closeIdx + 8);
+          insideThink = false;
+          continue;
+        }
+        const openIdx = buffer.indexOf('<think>');
+        if (openIdx === -1) {
+          if (buffer.length <= 7) return;
+          const safe = buffer.slice(0, -7);
+          buffer = buffer.slice(-7);
+          if (safe) controller.enqueue(safe);
+          return;
+        }
+        if (openIdx > 0) controller.enqueue(buffer.slice(0, openIdx));
+        buffer = buffer.slice(openIdx + 7);
+        insideThink = true;
+      }
+    },
+    flush(controller) {
+      if (!insideThink && buffer.length > 0) controller.enqueue(buffer);
+    },
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { messages, reportContext } = (await request.json()) as ChatRequestBody;
@@ -34,13 +68,15 @@ export async function POST(request: NextRequest) {
     });
 
     const encoder = new TextEncoder();
-    const byteStream = stream.pipeThrough(
-      new TransformStream<string, Uint8Array>({
-        transform(chunk, controller) {
-          controller.enqueue(encoder.encode(chunk));
-        },
-      }),
-    );
+    const byteStream = stream
+      .pipeThrough(createThinkStripper())
+      .pipeThrough(
+        new TransformStream<string, Uint8Array>({
+          transform(chunk, controller) {
+            controller.enqueue(encoder.encode(chunk));
+          },
+        }),
+      );
 
     return new Response(byteStream, {
       headers: {
