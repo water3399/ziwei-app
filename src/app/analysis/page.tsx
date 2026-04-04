@@ -9,7 +9,7 @@ import StepIndicator from '@/components/analysis/StepIndicator';
 import BirthForm from '@/components/analysis/BirthForm';
 import ZiweiChart from '@/components/chart/ZiweiChart';
 import AnalysisLoading from '@/components/analysis/AnalysisLoading';
-import ReportView from '@/components/analysis/ReportView';
+import VisualReport from '@/components/analysis/VisualReport';
 import Link from 'next/link';
 
 const initialBirth: BirthData = {
@@ -113,14 +113,16 @@ export default function AnalysisPage() {
       }
       const data = await res.json();
       const id = crypto.randomUUID();
+      // Store analysis JSON as stringified markdown for compatibility
+      const markdownStore = JSON.stringify(data.analysis);
       saveReport({
         id,
         createdAt: new Date().toISOString(),
         birthData: state.birthData,
         chartData: state.chartData,
-        markdown: data.markdown,
+        markdown: markdownStore,
       });
-      dispatch({ type: 'ANALYZE_SUCCESS', markdown: data.markdown, id });
+      dispatch({ type: 'ANALYZE_SUCCESS', markdown: markdownStore, id });
     } catch (err) {
       dispatch({ type: 'ANALYZE_ERROR', error: err instanceof Error ? err.message : '分析失敗' });
     }
@@ -225,7 +227,15 @@ export default function AnalysisPage() {
                   </div>
                 )}
 
-                <ReportView markdown={state.reportMarkdown} />
+                {(() => {
+                  try {
+                    const analysisData = JSON.parse(state.reportMarkdown);
+                    return <VisualReport data={analysisData} />;
+                  } catch {
+                    // Fallback: if not JSON, show as text
+                    return <div className="text-purple-200 whitespace-pre-wrap text-sm">{state.reportMarkdown}</div>;
+                  }
+                })()}
 
                 {/* Actions */}
                 <div className="flex flex-wrap gap-3 justify-center mt-8">
