@@ -230,12 +230,20 @@ export default function AnalysisPage() {
                 {/* Actions */}
                 <div className="flex flex-wrap gap-3 justify-center mt-8">
                   {state.reportId && (
-                    <Link
-                      href={`/chat/${state.reportId}`}
-                      className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-purple-600/80 to-purple-700/80 text-white text-sm font-bold hover:from-purple-500/80 hover:to-purple-600/80 transition-all"
-                    >
-                      💬 向紫微大師提問
-                    </Link>
+                    <>
+                      <Link
+                        href={`/fortune/${state.reportId}`}
+                        className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-yellow-600/80 to-amber-600/80 text-white text-sm font-bold hover:from-yellow-500/80 hover:to-amber-500/80 transition-all"
+                      >
+                        📅 流年逐月分析
+                      </Link>
+                      <Link
+                        href={`/chat/${state.reportId}`}
+                        className="px-6 py-2.5 rounded-lg bg-gradient-to-r from-purple-600/80 to-purple-700/80 text-white text-sm font-bold hover:from-purple-500/80 hover:to-purple-600/80 transition-all"
+                      >
+                        💬 向紫微大師提問
+                      </Link>
+                    </>
                   )}
                   <button
                     onClick={() => window.print()}
