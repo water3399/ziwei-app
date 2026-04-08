@@ -135,6 +135,8 @@ export async function POST(request: NextRequest) {
     });
 
     const cleaned = rawContent.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+    console.log('[Analyze] Raw length:', rawContent.length, 'Cleaned length:', cleaned.length);
+    console.log('[Analyze] First 200 chars:', cleaned.substring(0, 200));
 
     let analysis;
     try {

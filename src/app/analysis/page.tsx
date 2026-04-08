@@ -112,8 +112,11 @@ export default function AnalysisPage() {
         throw new Error(data.error || '分析失敗');
       }
       const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      if (!data.analysis || !data.analysis.profile) {
+        throw new Error('AI 回應格式異常，請重新分析');
+      }
       const id = crypto.randomUUID();
-      // Store analysis JSON as stringified markdown for compatibility
       const markdownStore = JSON.stringify(data.analysis);
       saveReport({
         id,
