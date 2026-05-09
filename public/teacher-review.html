@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>紫微斗數 — 同氣對應表校正</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d28;
+    --border: #2a2d3a;
+    --text: #d4d4dc;
+    --text-dim: #8888a0;
+    --accent: #c9a84c;
+    --accent-dim: #8b7633;
+    --green: #4ade80;
+    --red: #f87171;
+    --blue: #60a5fa;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  h1 {
+    color: var(--accent);
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+  }
+  .subtitle {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 24px;
+  }
+  .stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .stat-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 20px;
+    min-width: 120px;
+    text-align: center;
+  }
+  .stat-box .num {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .stat-box .label {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+  .section-title {
+    font-size: 1.1rem;
+    color: var(--accent);
+    margin: 28px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .confirmed-badge {
+    display: inline-block;
+    background: #166534;
+    color: var(--green);
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+  }
+
+  /* Card style for each pair */
+  .pair-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+  .pair-card:hover { border-color: var(--accent-dim); }
+  .pair-card.approved { border-left: 3px solid var(--green); }
+  .pair-card.rejected { border-left: 3px solid var(--red); opacity: 0.6; }
+  .pair-card.modified { border-left: 3px solid var(--blue); }
+
+  .pair-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .star-pair {
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  .star-minor { color: var(--blue); }
+  .star-arrow { color: var(--text-dim); margin: 0 2px; }
+  .star-major { color: var(--accent); }
+  .effect-text {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+  }
+
+  /* Action buttons */
+  .actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .btn {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.15s;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.active-approve { background: #166534; border-color: var(--green); color: var(--green); }
+  .btn.active-reject { background: #7f1d1d; border-color: var(--red); color: var(--red); }
+  .btn.active-modify { background: #1e3a5f; border-color: var(--blue); color: var(--blue); }
+
+  /* Edit fields */
+  .edit-row {
+    display: none;
+    margin-top: 10px;
+    gap: 8px;
+    flex-direction: column;
+  }
+  .edit-row.show { display: flex; }
+  .edit-row label {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+  }
+  .edit-row input, .edit-row textarea {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    width: 100%;
+  }
+  .edit-row input:focus, .edit-row textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .edit-row textarea { resize: vertical; min-height: 50px; }
+
+  /* Questions section */
+  .question-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .question-card .q {
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .question-card textarea {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    width: 100%;
+    resize: vertical;
+    min-height: 60px;
+  }
+  .question-card textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  /* Add new pair */
+  .add-section {
+    background: var(--card);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .add-section h3 {
+    color: var(--accent);
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+  .add-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .add-row input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    flex: 1;
+    min-width: 100px;
+  }
+  .add-row input:focus { outline: none; border-color: var(--accent); }
+  .btn-add {
+    background: var(--accent-dim);
+    border: none;
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  .btn-add:hover { background: var(--accent); }
+
+  /* Export */
+  .export-bar {
+    position: sticky;
+    bottom: 0;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 10px 10px 0 0;
+    margin-top: 32px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .export-bar .progress {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+  }
+  .btn-export {
+    background: var(--accent);
+    border: none;
+    color: #000;
+    padding: 10px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+  .btn-export:hover { background: #dbb85c; }
+  .btn-copy {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 10px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+  .btn-copy:hover { background: var(--accent); color: #000; }
+
+  .toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--green);
+    color: #000;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    display: none;
+    z-index: 100;
+  }
+  .toast.show { display: block; animation: fadeout 2s forwards; }
+  @keyframes fadeout { 0%{opacity:1} 70%{opacity:1} 100%{opacity:0;display:none} }
+</style>
+</head>
+<body>
+
+<h1>紫微斗數 — 同氣對應表校正</h1>
+<p class="subtitle">請老師逐行審核：小星和主星的「同氣」對應關係是否正確。可以批准、否決、或修改。</p>
+
+<div class="stats">
+  <div class="stat-box"><div class="num" id="stat-total">32</div><div class="label">待審核</div></div>
+  <div class="stat-box"><div class="num" id="stat-approved" style="color:var(--green)">0</div><div class="label">已批准</div></div>
+  <div class="stat-box"><div class="num" id="stat-rejected" style="color:var(--red)">0</div><div class="label">已否決</div></div>
+  <div class="stat-box"><div class="num" id="stat-modified" style="color:var(--blue)">0</div><div class="label">已修改</div></div>
+</div>
+
+<div class="section-title">已確認（老師口述過）<span class="confirmed-badge">已確認</span></div>
+<div id="confirmed-list"></div>
+
+<div class="section-title">待確認（公開資料推導）</div>
+<div id="pending-list"></div>
+
+<div class="section-title">老師補充的對應</div>
+<div class="add-section">
+  <h3>新增一組同氣對應</h3>
+  <div class="add-row">
+    <input type="text" id="new-minor" placeholder="小星名稱">
+    <input type="text" id="new-major" placeholder="對應主星">
+    <input type="text" id="new-effect" placeholder="效果描述">
+    <button class="btn-add" onclick="addNewPair()">新增</button>
+  </div>
+  <div id="added-list"></div>
+</div>
+
+<div class="section-title">額外問題請教老師</div>
+<div id="questions-list"></div>
+
+<div class="export-bar">
+  <span class="progress" id="progress-text">尚未開始審核</span>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn-copy" onclick="copyResults()">複製結果</button>
+    <button class="btn-export" onclick="exportJSON()">匯出 JSON</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DATA = {
+  confirmed: [
+    { minor: '天才', major: '天機', effect: '智慧、靈活加倍，思維更敏捷' },
+    { minor: '破碎', major: '破軍', effect: '破壞、動盪加倍，變動更劇烈' },
+  ],
+  pending: [
+    { minor: '天壽', major: '天梁', effect: '蔭星加倍，逢凶化吉力更強' },
+    { minor: '龍池', major: '天府', effect: '庫藏貴氣加倍，財富更穩固' },
+    { minor: '鳳閣', major: '天相', effect: '典雅印星加倍，行政能力更強' },
+    { minor: '恩光', major: '太陽', effect: '光明榮耀加倍，公開貴氣更顯' },
+    { minor: '天貴', major: '太陰', effect: '隱性貴氣加倍，科名運更強' },
+    { minor: '三台', major: '太陽', effect: '位階名聲加倍（經左輔）' },
+    { minor: '八座', major: '太陰', effect: '位階財富加倍（經右弼）' },
+    { minor: '天官', major: '天梁', effect: '權威正義加倍，官運更旺' },
+    { minor: '天福', major: '天同', effect: '福氣安逸加倍' },
+    { minor: '天巫', major: '天梁', effect: '靈性庇蔭加倍，宗教緣更深' },
+    { minor: '解神', major: '天梁', effect: '化解災厄能力加倍' },
+    { minor: '台輔', major: '左輔', effect: '直接輔助力加倍' },
+    { minor: '封誥', major: '右弼', effect: '幕後輔助力加倍' },
+    { minor: '天姚', major: '廉貞', effect: '感官桃花加倍，慾望更強' },
+    { minor: '咸池', major: '貪狼', effect: '肉慾桃花加倍，原始吸引力更強' },
+    { minor: '紅鸞', major: '貪狼', effect: '婚姻桃花加倍，異性緣更旺' },
+    { minor: '天喜', major: '貪狼', effect: '喜慶浪漫加倍' },
+    { minor: '天刑', major: '廉貞', effect: '刑罰紀律加倍，官非風險增' },
+    { minor: '天刑', major: '七殺', effect: '將星殺氣加倍，軍警法律緣深' },
+    { minor: '華蓋', major: '天梁', effect: '宗教孤獨傾向加倍' },
+    { minor: '天哭', major: '巨門', effect: '暗黑悲觀加倍' },
+    { minor: '天虛', major: '太陰', effect: '空虛感傷加倍' },
+    { minor: '陰煞', major: '巨門', effect: '暗黑猜忌加倍' },
+    { minor: '孤辰', major: '天梁', effect: '孤高出世傾向加倍' },
+    { minor: '寡宿', major: '天機', effect: '離群哲思傾向加倍' },
+    { minor: '天月', major: '太陰', effect: '月系陰性能量加倍，慢性健康議題' },
+    { minor: '天廚', major: '天府', effect: '食祿物質豐裕加倍' },
+    { minor: '蜚廉', major: '七殺', effect: '攻擊破壞力加倍' },
+    { minor: '天馬', major: '天機', effect: '驛動不安定加倍' },
+    { minor: '天空', major: '天機', effect: '抽象空想加倍' },
+  ],
+  questions: [
+    '同宮和對宮的加倍效果是一樣強嗎？還是同宮更強？',
+    '三方四正（非對宮）的小星也算同氣嗎？',
+    '幾顆同氣小星同時出現算「壓過主星」？2顆？3顆？',
+    '除了上面列的，還有哪些小星是老師實務中常看的？',
+  ],
+};
+
+// State
+const state = {};
+const addedPairs = [];
+
+function initState() {
+  DATA.confirmed.forEach((d, i) => { state[`c_${i}`] = { ...d, status: 'approved', newMajor: '', newEffect: '', note: '' }; });
+  DATA.pending.forEach((d, i) => { state[`p_${i}`] = { ...d, status: 'pending', newMajor: '', newEffect: '', note: '' }; });
+}
+
+function renderCard(id, item, isConfirmed) {
+  const s = state[id];
+  const statusClass = s.status === 'approved' ? 'approved' : s.status === 'rejected' ? 'rejected' : s.status === 'modified' ? 'modified' : '';
+
+  return `
+    <div class="pair-card ${statusClass}" id="card-${id}">
+      <div class="pair-header">
+        <span class="star-pair">
+          <span class="star-minor">${item.minor}</span>
+          <span class="star-arrow">&rarr;</span>
+          <span class="star-major">${s.newMajor || item.major}</span>
+        </span>
+        ${isConfirmed ? '<span class="confirmed-badge">已確認</span>' : ''}
+      </div>
+      <div class="effect-text">${s.newEffect || item.effect}</div>
+      <div class="actions">
+        <button class="btn ${s.status === 'approved' ? 'active-approve' : ''}" onclick="setStatus('${id}','approved')">&#10003; 正確</button>
+        <button class="btn ${s.status === 'rejected' ? 'active-reject' : ''}" onclick="setStatus('${id}','rejected')">&#10007; 不適用</button>
+        <button class="btn ${s.status === 'modified' ? 'active-modify' : ''}" onclick="toggleEdit('${id}')">&#9998; 修改</button>
+      </div>
+      <div class="edit-row ${s.status === 'modified' ? 'show' : ''}" id="edit-${id}">
+        <label>修正對應主星（留空表示不改）</label>
+        <input type="text" value="${s.newMajor}" placeholder="${item.major}" onchange="updateField('${id}','newMajor',this.value)">
+        <label>修正效果描述（留空表示不改）</label>
+        <textarea onchange="updateField('${id}','newEffect',this.value)" placeholder="${item.effect}">${s.newEffect}</textarea>
+        <label>備註</label>
+        <input type="text" value="${s.note}" placeholder="補充說明..." onchange="updateField('${id}','note',this.value)">
+      </div>
+    </div>
+  `;
+}
+
+function render() {
+  const cl = document.getElementById('confirmed-list');
+  const pl = document.getElementById('pending-list');
+  cl.innerHTML = DATA.confirmed.map((d, i) => renderCard(`c_${i}`, d, true)).join('');
+  pl.innerHTML = DATA.pending.map((d, i) => renderCard(`p_${i}`, d, false)).join('');
+  renderAdded();
+  renderQuestions();
+  updateStats();
+  saveLocal();
+}
+
+function renderAdded() {
+  const al = document.getElementById('added-list');
+  al.innerHTML = addedPairs.map((p, i) => `
+    <div class="pair-card approved" style="margin-top:8px">
+      <div class="pair-header">
+        <span class="star-pair">
+          <span class="star-minor">${p.minor}</span>
+          <span class="star-arrow">&rarr;</span>
+          <span class="star-major">${p.major}</span>
+        </span>
+        <span class="confirmed-badge" style="background:#1e3a5f;color:var(--blue)">老師新增</span>
+        <button class="btn" style="margin-left:auto;font-size:0.75rem" onclick="removeAdded(${i})">刪除</button>
+      </div>
+      <div class="effect-text">${p.effect}</div>
+    </div>
+  `).join('');
+}
+
+function renderQuestions() {
+  const ql = document.getElementById('questions-list');
+  ql.innerHTML = DATA.questions.map((q, i) => `
+    <div class="question-card">
+      <div class="q">${i + 1}. ${q}</div>
+      <textarea id="answer-${i}" placeholder="老師回覆..." oninput="saveLocal()">${getAnswer(i)}</textarea>
+    </div>
+  `).join('');
+}
+
+function getAnswer(i) {
+  try { return JSON.parse(localStorage.getItem('teacher_answers') || '{}')[i] || ''; } catch { return ''; }
+}
+
+function setStatus(id, status) {
+  if (state[id].status === status) {
+    state[id].status = 'pending';
+  } else {
+    state[id].status = status;
+  }
+  render();
+}
+
+function toggleEdit(id) {
+  state[id].status = state[id].status === 'modified' ? 'pending' : 'modified';
+  render();
+}
+
+function updateField(id, field, value) {
+  state[id][field] = value;
+  if (field !== 'note' && value.trim()) state[id].status = 'modified';
+  saveLocal();
+  updateStats();
+}
+
+function updateStats() {
+  const all = Object.values(state);
+  const approved = all.filter(s => s.status === 'approved').length;
+  const rejected = all.filter(s => s.status === 'rejected').length;
+  const modified = all.filter(s => s.status === 'modified').length;
+  const pending = all.filter(s => s.status === 'pending').length;
+
+  document.getElementById('stat-total').textContent = pending;
+  document.getElementById('stat-approved').textContent = approved;
+  document.getElementById('stat-rejected').textContent = rejected;
+  document.getElementById('stat-modified').textContent = modified;
+
+  const done = approved + rejected + modified;
+  const total = all.length;
+  document.getElementById('progress-text').textContent =
+    done === 0 ? '尚未開始審核' :
+    done === total ? `全部完成！共 ${total} 組` :
+    `已審核 ${done}/${total} 組`;
+}
+
+function addNewPair() {
+  const minor = document.getElementById('new-minor').value.trim();
+  const major = document.getElementById('new-major').value.trim();
+  const effect = document.getElementById('new-effect').value.trim();
+  if (!minor || !major) { showToast('請填寫小星和主星'); return; }
+  addedPairs.push({ minor, major, effect: effect || '（待補充）' });
+  document.getElementById('new-minor').value = '';
+  document.getElementById('new-major').value = '';
+  document.getElementById('new-effect').value = '';
+  render();
+  showToast('已新增');
+}
+
+function removeAdded(i) {
+  addedPairs.splice(i, 1);
+  render();
+}
+
+function getResults() {
+  const results = {
+    timestamp: new Date().toISOString(),
+    reviewed: [],
+    added: [...addedPairs],
+    answers: {},
+  };
+
+  for (const [id, s] of Object.entries(state)) {
+    results.reviewed.push({
+      minor: s.minor,
+      major: s.newMajor || s.major,
+      originalMajor: s.major,
+      effect: s.newEffect || s.effect,
+      originalEffect: s.effect,
+      status: s.status,
+      note: s.note,
+      wasModified: !!(s.newMajor || s.newEffect),
+    });
+  }
+
+  DATA.questions.forEach((q, i) => {
+    const el = document.getElementById(`answer-${i}`);
+    if (el && el.value.trim()) results.answers[q] = el.value.trim();
+  });
+
+  return results;
+}
+
+function exportJSON() {
+  const results = getResults();
+  const blob = new Blob([JSON.stringify(results, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `resonance-review-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('已匯出 JSON');
+}
+
+function copyResults() {
+  const r = getResults();
+  const lines = ['# 同氣對應表校正結果', `審核時間：${r.timestamp}`, ''];
+
+  const approved = r.reviewed.filter(x => x.status === 'approved');
+  const rejected = r.reviewed.filter(x => x.status === 'rejected');
+  const modified = r.reviewed.filter(x => x.status === 'modified');
+  const pending = r.reviewed.filter(x => x.status === 'pending');
+
+  if (approved.length) {
+    lines.push(`## 批准（${approved.length} 組）`);
+    approved.forEach(x => lines.push(`- ${x.minor} -> ${x.major}：${x.effect}`));
+    lines.push('');
+  }
+  if (modified.length) {
+    lines.push(`## 修改（${modified.length} 組）`);
+    modified.forEach(x => {
+      const changes = [];
+      if (x.wasModified && x.major !== x.originalMajor) changes.push(`主星：${x.originalMajor} -> ${x.major}`);
+      if (x.wasModified && x.effect !== x.originalEffect) changes.push(`效果改為：${x.effect}`);
+      lines.push(`- ${x.minor}：${changes.join('；') || x.effect}${x.note ? `（備註：${x.note}）` : ''}`);
+    });
+    lines.push('');
+  }
+  if (rejected.length) {
+    lines.push(`## 否決（${rejected.length} 組）`);
+    rejected.forEach(x => lines.push(`- ${x.minor} -> ${x.originalMajor}${x.note ? `（原因：${x.note}）` : ''}`));
+    lines.push('');
+  }
+  if (pending.length) {
+    lines.push(`## 未審核（${pending.length} 組）`);
+    pending.forEach(x => lines.push(`- ${x.minor} -> ${x.major}`));
+    lines.push('');
+  }
+  if (r.added.length) {
+    lines.push(`## 老師新增（${r.added.length} 組）`);
+    r.added.forEach(x => lines.push(`- ${x.minor} -> ${x.major}：${x.effect}`));
+    lines.push('');
+  }
+  if (Object.keys(r.answers).length) {
+    lines.push('## 問題回覆');
+    for (const [q, a] of Object.entries(r.answers)) {
+      lines.push(`Q: ${q}`);
+      lines.push(`A: ${a}`);
+      lines.push('');
+    }
+  }
+
+  navigator.clipboard.writeText(lines.join('\n')).then(() => showToast('已複製到剪貼簿'));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast';
+  void t.offsetWidth;
+  t.className = 'toast show';
+  setTimeout(() => { t.className = 'toast'; }, 2200);
+}
+
+function saveLocal() {
+  localStorage.setItem('teacher_review_state', JSON.stringify(state));
+  localStorage.setItem('teacher_review_added', JSON.stringify(addedPairs));
+  const answers = {};
+  DATA.questions.forEach((q, i) => {
+    const el = document.getElementById(`answer-${i}`);
+    if (el) answers[i] = el.value;
+  });
+  localStorage.setItem('teacher_answers', JSON.stringify(answers));
+}
+
+function loadLocal() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('teacher_review_state'));
+    if (saved) Object.assign(state, saved);
+    const savedAdded = JSON.parse(localStorage.getItem('teacher_review_added'));
+    if (savedAdded) addedPairs.push(...savedAdded);
+  } catch {}
+}
+
+// Init
+initState();
+loadLocal();
+render();
+</script>
+</body>
+</html>

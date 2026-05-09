@@ -1,6 +1,7 @@
 import type { ChartData, PalaceData } from './types';
 import { formatPalaceText } from './engine';
 import { getStarTraits, getComboInterpretation, getPalaceMeaning, MUTAGEN_MEANINGS } from './knowledge';
+import { formatSignalsForContext, generateSignals } from './rules';
 
 // 為單一宮位生成知識增強的分析上下文
 function buildPalaceContext(palace: PalaceData): string {
@@ -70,7 +71,16 @@ export function buildAnalysisContext(chart: ChartData): string {
     }
   }
 
-  // 3. 十二宮位逐宮分析
+  // 3. 進階命盤訊號
+  const advancedSignals = formatSignalsForContext(generateSignals(chart.palaces, 1));
+  if (advancedSignals) {
+    sections.push('');
+    sections.push(advancedSignals);
+    sections.push('');
+    sections.push('使用原則：核心訊號可作為優先判斷依據；參考訊號只能輔助分析，不能單獨下定論。');
+  }
+
+  // 4. 十二宮位逐宮分析
   sections.push('');
   sections.push(`===== 十二宮位詳細資料（含知識庫解釋） =====`);
 
@@ -89,7 +99,7 @@ export function buildAnalysisContext(chart: ChartData): string {
     sections.push(buildPalaceContext(palace));
   }
 
-  // 4. 大限流年
+  // 5. 大限流年
   if (chart.currentDecadal) {
     sections.push('');
     sections.push(`===== 當前大限（${year}年） =====`);
@@ -128,6 +138,12 @@ export function buildChatContext(chart: ChartData, reportMarkdown: string): stri
 
   if (chart.mutagenStars.length > 0) {
     lines.push(`四化：${chart.mutagenStars.map(m => `${m.starName}化${m.mutagen}→${m.palaceName}`).join('、')}`);
+  }
+
+  const advancedSignals = formatSignalsForContext(generateSignals(chart.palaces, 1));
+  if (advancedSignals) {
+    lines.push('');
+    lines.push(advancedSignals);
   }
 
   // 附上報告的前 2000 字作為參考
