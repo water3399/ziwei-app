@@ -4,7 +4,7 @@
 
 import type { PalaceData } from '../types';
 import { getResonanceByMinor } from './starResonance';
-import { MALEFIC_PROFILES } from './maleficRules';
+import { MALEFIC_PROFILES, MALEFIC_INTERACTIONS, MALEFIC_PATTERNS, MALEFIC_TAMERS } from './maleficRules';
 import { getStarTags } from './starTags';
 import {
   calculateAllFlyingMutagens,
@@ -50,7 +50,13 @@ export function generateSignals(
   // 2. 煞星能量標籤
   signals.push(...detectMaleficTags(palaces));
 
-  // 3. 飛星四化
+  // 3. 煞星×主星交互 + 格局偵測
+  signals.push(...detectMaleficInteractions(palaces));
+  if (maxPhase >= 2) {
+    signals.push(...detectMaleficPatterns(palaces));
+  }
+
+  // 4. 飛星四化
   if (maxPhase >= 1) {
     signals.push(...detectFlyingSignals(palaces, maxPhase));
   }
@@ -124,6 +130,106 @@ function detectMaleficTags(palaces: PalaceData[]): AdvancedSignal[] {
         summary: `${palace.name}有${star.name}（${profile.nature}），能量標籤：${tags.join('、')}`,
         phase: 1,
       });
+    }
+  }
+
+  return signals;
+}
+
+// ----- 煞星×主星交互偵測 -----
+function detectMaleficInteractions(palaces: PalaceData[]): AdvancedSignal[] {
+  const signals: AdvancedSignal[] = [];
+
+  for (const palace of palaces) {
+    const majorNames = palace.majorStars.map(s => s.name);
+    const allNames = new Set([
+      ...majorNames,
+      ...palace.minorStars.map(s => s.name),
+    ]);
+
+    // 煞星×主星交互
+    for (const rule of MALEFIC_INTERACTIONS) {
+      if (allNames.has(rule.malefic) && allNames.has(rule.major)) {
+        signals.push({
+          type: 'malefic_tag',
+          confidence: 'public_sources',
+          palace: palace.name,
+          stars: [rule.major, rule.malefic],
+          summary: `${palace.name}：${rule.major}+${rule.malefic}同宮 — ${rule.effect}`,
+          phase: 1,
+        });
+      }
+    }
+
+    // 煞星數量 + 制煞判斷
+    const allNamesArr = Array.from(allNames);
+    const maleficNames = allNamesArr.filter(n => MALEFIC_PROFILES[n]);
+    const maleficCount = maleficNames.length;
+    if (maleficCount >= 2) {
+      const tamer = majorNames.find(n => MALEFIC_TAMERS.includes(n));
+      const summary = tamer
+        ? `${palace.name}有${maleficCount}煞（${maleficNames.join('、')}），但${tamer}可制煞${maleficCount > 2 ? '（超過2顆，制煞力有限）' : ''}`
+        : `${palace.name}有${maleficCount}煞同宮（${maleficNames.join('、')}），無主星制煞，此宮壓力較大`;
+      signals.push({
+        type: 'malefic_tag',
+        confidence: 'public_sources',
+        palace: palace.name,
+        stars: maleficNames,
+        summary,
+        phase: 1,
+      });
+    }
+  }
+
+  return signals;
+}
+
+// ----- 格局偵測（Phase 2）-----
+function detectMaleficPatterns(palaces: PalaceData[]): AdvancedSignal[] {
+  const signals: AdvancedSignal[] = [];
+
+  for (const pattern of MALEFIC_PATTERNS) {
+    // 同宮型格局：所有星在同一宮
+    for (const palace of palaces) {
+      const allNames = new Set([
+        ...palace.majorStars.map(s => s.name),
+        ...palace.minorStars.map(s => s.name),
+        ...palace.adjectiveStars.map(s => s.name),
+      ]);
+      const hasAll = pattern.stars.every(s => allNames.has(s));
+      if (hasAll) {
+        signals.push({
+          type: 'malefic_tag',
+          confidence: 'public_sources',
+          palace: palace.name,
+          stars: pattern.stars,
+          summary: `${palace.name}成【${pattern.name}】：${pattern.description}`,
+          phase: 2,
+        });
+      }
+    }
+
+    // 夾宮型格局（羊陀夾、火鈴夾、空劫夾）
+    if (pattern.condition?.includes('夾') && pattern.stars.length === 2) {
+      for (let i = 0; i < palaces.length; i++) {
+        const prev = palaces[(i + 11) % 12];
+        const next = palaces[(i + 1) % 12];
+        const prevAll = new Set([...prev.majorStars.map(s => s.name), ...prev.minorStars.map(s => s.name)]);
+        const nextAll = new Set([...next.majorStars.map(s => s.name), ...next.minorStars.map(s => s.name)]);
+
+        const [s1, s2] = pattern.stars;
+        const isClamp = (prevAll.has(s1) && nextAll.has(s2)) || (prevAll.has(s2) && nextAll.has(s1));
+        if (isClamp) {
+          signals.push({
+            type: 'malefic_tag',
+            confidence: 'public_sources',
+            palace: palaces[i].name,
+            stars: pattern.stars,
+            summary: `${palaces[i].name}被【${pattern.name}】：${pattern.description}`,
+            phase: 2,
+          });
+        }
+      }
     }
   }
 

@@ -193,40 +193,81 @@ export interface MaleficInteraction {
 }
 
 export const MALEFIC_INTERACTIONS: MaleficInteraction[] = [
-  // 七殺
-  { malefic: '擎羊', major: '七殺', effect: '行動力極強但衝突感重，容易正面對撞，需注意人際摩擦' },
-  { malefic: '鈴星', major: '七殺', effect: '策略性強但手段偏激，表面和善內在較有算計' },
-  { malefic: '火星', major: '七殺', effect: '積極進取、執行力堅強。更會擎羊尤佳' },
+  // ===== 紫微 =====
+  { malefic: '擎羊', major: '紫微', effect: '多遇困難，但帝星制煞，持之以恆可有成' },
+  { malefic: '陀羅', major: '紫微', effect: '內心糾結但外表穩重，做事容易繞遠路' },
+  { malefic: '火星', major: '紫微', effect: '帝星遇明火，行動力增強但脾氣加大' },
+  { malefic: '鈴星', major: '紫微', effect: '內在焦慮感增加，外表不易察覺' },
+  { malefic: '地空', major: '紫微', effect: '高瞻遠矚轉為目光短淺' },
+  { malefic: '地劫', major: '紫微', effect: '權威感受損，容易在關鍵時刻失去資源支持' },
 
-  // 廉貞
+  // ===== 天機 =====
+  { malefic: '擎羊', major: '天機', effect: '天機最怕煞忌交併，思緒混亂、多學少精' },
+  { malefic: '陀羅', major: '天機', effect: '思慮過度、鑽牛角尖，決策困難' },
+  { malefic: '火星', major: '天機', effect: '聰明但急躁，容易因衝動判斷失誤' },
+  { malefic: '鈴星', major: '天機', effect: '內心計較但不表露，容易積壓焦慮' },
+
+  // ===== 太陽 =====
+  { malefic: '擎羊', major: '太陽', effect: '廟旺時光芒照射不畏煞星；落陷則付出無回報' },
+  { malefic: '陀羅', major: '太陽', effect: '廟旺時尚可，落陷則做事拖延、光芒受阻' },
+  { malefic: '火星', major: '太陽', effect: '熱情加倍但消耗也加倍，容易過度燃燒自己' },
+
+  // ===== 武曲 =====
+  { malefic: '擎羊', major: '武曲', effect: '財星遇刀，理財果斷但容易因衝動導致金錢糾紛' },
+  { malefic: '陀羅', major: '武曲', effect: '賺錢辛苦、進展緩慢，但毅力強' },
+  { malefic: '火星', major: '武曲', effect: '快速決斷的財務能力，但風險意識不足' },
+  { malefic: '地空', major: '武曲', effect: '財星落空，理財能力打折' },
+  { malefic: '地劫', major: '武曲', effect: '財來財去、難以積累' },
+
+  // ===== 天同 =====
+  { malefic: '擎羊', major: '天同', effect: '福星遇煞，安逸被打破，反而激發上進心' },
+  { malefic: '火星', major: '天同', effect: '懶散性格被火星激活，行動力提升但內心矛盾' },
+
+  // ===== 廉貞 =====
   { malefic: '擎羊', major: '廉貞', effect: '法律意識需特別加強，容易因衝動決策引發合規風險' },
+  { malefic: '陀羅', major: '廉貞', effect: '內心糾結感情問題，容易陷入不健康的關係循環' },
   { malefic: '鈴星', major: '廉貞', effect: '內在壓力大，面臨抉擇時容易走極端路線' },
   { malefic: '火星', major: '廉貞', effect: '情緒波動劇烈，需特別關注心理健康和壓力管理' },
 
-  // 破軍
-  { malefic: '擎羊', major: '破軍', effect: '變動劇烈，身體和財務都需額外留意安全防護' },
-  { malefic: '陀羅', major: '破軍', effect: '變動劇烈，反覆拖延中消耗資源，需設定止損點' },
+  // ===== 天府 =====
+  { malefic: '地空', major: '天府', effect: '財庫落空，精明求財轉為保守，穩定感下降' },
+  { malefic: '地劫', major: '天府', effect: '財庫被劫，積蓄難守，需多元配置資產' },
 
-  // 太陽
-  { malefic: '擎羊', major: '太陽', effect: '廟旺時以光芒照射不畏煞星，落陷則大為不利' },
-  { malefic: '陀羅', major: '太陽', effect: '廟旺時以光芒照射不畏煞星，落陷則大為不利' },
+  // ===== 太陰 =====
+  { malefic: '擎羊', major: '太陰', effect: '感性與剛硬衝突，情緒容易兩極化' },
+  { malefic: '陀羅', major: '太陰', effect: '多愁善感加重，容易反覆糾結於感情問題' },
+  { malefic: '火星', major: '太陰', effect: '內在焦慮外化，情緒爆發點低' },
+  { malefic: '地空', major: '太陰', effect: '田產、母親緣分受影響，置產需謹慎' },
 
-  // 天機
-  { malefic: '擎羊', major: '天機', effect: '天機最怕煞忌交併，多學少精' },
-  { malefic: '陀羅', major: '天機', effect: '天機最怕煞忌交併，多學少精' },
+  // ===== 貪狼 =====
+  { malefic: '火星', major: '貪狼', effect: '火貪格，主橫發暴富（需同宮才算正格）' },
+  { malefic: '鈴星', major: '貪狼', effect: '鈴貪格，先有名再有利（需同宮才算正格）' },
+  { malefic: '擎羊', major: '貪狼', effect: '慾望加衝動，感情和投資都容易衝過頭' },
+  { malefic: '陀羅', major: '貪狼', effect: '慾望被壓抑但不會消失，容易暗中發展' },
 
-  // 天梁
+  // ===== 巨門 =====
+  { malefic: '擎羊', major: '巨門', effect: '口舌加刀鋒，言辭犀利但容易傷人傷己' },
+  { malefic: '陀羅', major: '巨門', effect: '暗星遇阻滯，猜疑心加重，人際關係更吃力' },
+  { malefic: '火星', major: '巨門', effect: '急躁+口舌，容易因衝動發言引發衝突' },
+
+  // ===== 天相 =====
+  { malefic: '擎羊', major: '天相', effect: '印星受損，輔佐能力打折，容易被人利用' },
+  { malefic: '地空', major: '天相', effect: '印星落空，得到的承諾容易落空' },
+
+  // ===== 天梁 =====
   { malefic: '擎羊', major: '天梁', effect: '落陷時蔭星保護力減弱，容易因固執而損害自身形象' },
+  { malefic: '陀羅', major: '天梁', effect: '逢凶化吉的過程更加曲折漫長' },
   { malefic: '火星', major: '天梁', effect: '火星+擎羊同會則蔭星結構被沖破，人際支持網容易瓦解' },
 
-  // 紫微
-  { malefic: '擎羊', major: '紫微', effect: '多遇困難，但帝星制煞，持之以恆可有成' },
-  { malefic: '地空', major: '紫微', effect: '高瞻遠矚轉為目光短淺' },
+  // ===== 七殺 =====
+  { malefic: '擎羊', major: '七殺', effect: '行動力極強但衝突感重，容易正面對撞，需注意人際摩擦' },
+  { malefic: '陀羅', major: '七殺', effect: '殺氣被壓抑，決斷力下降但心機加重' },
+  { malefic: '鈴星', major: '七殺', effect: '策略性強但手段偏激，表面和善內在較有算計' },
+  { malefic: '火星', major: '七殺', effect: '積極進取、執行力堅強，行動派中的行動派' },
 
-  // 天府
-  { malefic: '地空', major: '天府', effect: '精明求財轉為保守，大忌' },
-
-  // 貪狼（吉格見 MALEFIC_PATTERNS）
-  { malefic: '火星', major: '貪狼', effect: '火貪格，主橫發暴富' },
-  { malefic: '鈴星', major: '貪狼', effect: '鈴貪格，主突進有名' },
+  // ===== 破軍 =====
+  { malefic: '擎羊', major: '破軍', effect: '變動劇烈，身體和財務都需額外留意安全防護' },
+  { malefic: '陀羅', major: '破軍', effect: '變動劇烈，反覆拖延中消耗資源，需設定止損點' },
+  { malefic: '火星', major: '破軍', effect: '破壞力加爆發力，改革徹底但善後困難' },
+  { malefic: '鈴星', major: '破軍', effect: '暗中醞釀的變革，表面平靜底下暗流洶湧' },
 ];
